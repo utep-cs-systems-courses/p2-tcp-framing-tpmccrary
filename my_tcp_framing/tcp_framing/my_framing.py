@@ -33,6 +33,8 @@ class MyFraming():
         # Send the message to the given socket.
         self.s.send(framedMessage)
 
+        return message
+
 
     # Receives a message from s (socket). Waits till whole message is recieved before returning to caller.
     def recvMessage(self):

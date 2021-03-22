@@ -10,10 +10,11 @@ from tcp_framing.my_framing import MyFraming
 from tcp_framing.my_read import myReadLine
 
 def main():
+    # Get user input.
     ui = UI()
-
     userArgs = ui.getUserInput()
 
+    # If first arg is scp then run command.
     if userArgs[0] == "scp":
         myClient = TcpClient(userArgs)
 
@@ -27,12 +28,14 @@ class TcpClient():
     
     def __init__(self, userArgs):
 
+        # If the args is just one, its not a valid input.
         if (len(userArgs) == 1):
             os.write(1, ("Incorrent input format.\n").encode())
             sys.exit(1)
         else:
-            self.clientFile = userArgs[2]
+            self.clientFile = userArgs[1]
 
+        # If the args equals 3, then get the host and remote file name.
         if len(userArgs) == 3:
             try:
                 self.host, self.remoteFile = re.split(
@@ -63,6 +66,7 @@ class TcpClient():
                 continue
             break
 
+        # If socket is none.
         if s is None:
             print('could not open socket')
             sys.exit(1)
@@ -77,27 +81,35 @@ class TcpClient():
 
         # s.send(self.frameMessage(self.defaultRemoteFile))
 
+        # Make MyFraming object with socket s. Used to send and receive messages.
         myFraming = MyFraming(s)
 
+        # Send remote file name to server.
         myFraming.sendMessage(self.remoteFile)
 
+        # Get message back from server.
         serverMessage = myFraming.recvMessage()
-
         os.write(1,("Received: " + serverMessage + "\n").encode())
 
+        # If server responded with okay, send the file contents.
         if (serverMessage == "ok"):
-            # Send file contents.
+            # Get all the file contents.
             fileContents = self.readFile(self.clientFile)
 
+            # Send the file contents to the server.
             myFraming.sendMessage(fileContents)
 
-            os.write(1, ("Sent: " + self.clientFile).encode())
+            os.write(1, ("Sent: " + self.clientFile + "\n").encode())
+
+            serverMessage = myFraming.recvMessage()
+            os.write(1,("Received: " + serverMessage + "\n").encode())
 
         s.close()
 
 
+    # Given a file name, reads all the lines and returns one string.
     def readFile(self, filename):
-        fd = os.open(filename, os.O_RDONLY)
+        fd = os.open("my_tcp_framing/test/" + filename, os.O_RDONLY)
 
         inLine = myReadLine(fd)
         allLines = ""
