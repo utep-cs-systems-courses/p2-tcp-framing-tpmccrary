@@ -9,6 +9,9 @@ from tcp_framing.tcp_ui import UI
 from tcp_framing.my_framing import MyFraming
 from tcp_framing.my_read import myReadLine
 
+# TODO: Add multi-threading.
+# TODO: Add threading lock. Code can be found in lecture notes named 22 mar.
+
 def main():
     # Get user input.
     ui = UI()
@@ -17,6 +20,7 @@ def main():
     # If first arg is scp then run command.
     if userArgs[0] == "scp":
         myClient = TcpClient(userArgs)
+
 
 class TcpClient():
     
@@ -44,7 +48,8 @@ class TcpClient():
                 print("Can't parse server:filename from '%s'" % userArgs[2])
                 sys.exit(1)
 
-        # Code from helloClient.py. Connects to socket.
+        # Code from helloClient.py. Creates a socket.
+        # Using host and port, tries to create. With an uspecified address family.
         s = None
         for res in socket.getaddrinfo(self.host, self.port, socket.AF_UNSPEC, socket.SOCK_STREAM):
             af, socktype, proto, canonname, sa = res
@@ -91,7 +96,7 @@ class TcpClient():
         serverMessage = myFraming.recvMessage()
         os.write(1,("Received: " + serverMessage + "\n").encode())
 
-        # If server responded with okay, send the file contents.
+        # If server responded with ok, send the file contents.
         if (serverMessage == "ok"):
             # Get all the file contents.
             fileContents = self.readFile(self.clientFile)
