@@ -5,7 +5,7 @@ import time
 import os
 import socket
 from tcp_framing.my_framing import MyFraming
-from threading import Thread, enumerate
+from threading import Thread, Lock
 
 threadNum = 0
 
@@ -37,7 +37,7 @@ class Worker(Thread):
         os.write(1, ("Received: " + fileName + " \n").encode())
 
         # If file name is already take, tell client.
-        if (os.path.isfile("./test/" + fileName)):
+        if (os.path.isfile("my_tcp_framing/test/" + fileName)):
             sentMessage = myFraming.sendMessage("Error: File already exist.")
             os.write(1, ("Sent: " + sentMessage + "\n").encode())
         # If it is not taken, create the file and write to it.
