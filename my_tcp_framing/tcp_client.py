@@ -13,13 +13,17 @@ from tcp_framing.my_read import myReadLine
 # TODO: Add threading lock. Code can be found in lecture notes named 22 mar.
 
 def main():
-    # Get user input.
-    ui = UI()
-    userArgs = ui.getUserInput()
 
-    # If first arg is scp then run command.
-    if userArgs[0] == "scp":
-        myClient = TcpClient(userArgs)
+    while True:
+        # Get user input.
+        ui = UI()
+        userArgs = ui.getUserInput()
+
+        # If first arg is scp then run command.
+        if userArgs[0] == "scp":
+            myClient = TcpClient(userArgs)
+        elif userArgs[0] == "exit":
+            exit()
 
 
 class TcpClient():
@@ -76,21 +80,14 @@ class TcpClient():
             print('could not open socket')
             sys.exit(1)
 
-        # while True:
-        #     conn, addr = s.accept() # wait until incoming connection request (and accept it)
-        #     if os.fork() == 0:      # child becomes server
-        #         print('Connected by', addr)
-        #         conn.send(b"hello")
-        #         conn.send(b"world")
-        #         conn.shutdown(socket.SHUT_WR)
-
-        # s.send(self.frameMessage(self.defaultRemoteFile))
 
         # Make MyFraming object with socket s. Used to send and receive messages.
         myFraming = MyFraming(s)
 
         # Send remote file name to server.
-        myFraming.sendMessage(self.remoteFile)
+        sentMessage = myFraming.sendMessage(self.remoteFile)
+        os.write(1, ("Sent: " + sentMessage + "\n").encode())
+
 
         # Get message back from server.
         serverMessage = myFraming.recvMessage()

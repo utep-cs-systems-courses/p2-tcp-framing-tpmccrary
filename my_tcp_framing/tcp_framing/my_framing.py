@@ -39,15 +39,19 @@ class MyFraming():
     # Receives a message from s (socket). Waits till whole message is recieved before returning to caller.
     def recvMessage(self):
         
-        # Get initil message.
-        message = self.s.recv(1024).decode()
+        try:
+            # Get initil message.
+            message = self.s.recv(1024).decode()
+        except socket.timeout:
+            os.write(1, ("Error: Socket timedout."))
+            return "null"
 
         # If message does not have a : in it, keep trying to get it until we do.
         while ":" not in message:
             message += self.s.recv(1024).decode()
 
         # Split the message up.
-        splitMessage = message.split(":")
+        splitMessage = message.split(":", 1)
 
         messageLen = splitMessage[0]
         message = splitMessage[1]
