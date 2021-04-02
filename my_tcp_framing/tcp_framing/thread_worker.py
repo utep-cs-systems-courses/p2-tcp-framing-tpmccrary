@@ -42,9 +42,9 @@ class Worker(Thread):
         os.write(1, ("Thread " + str(self.thisThread) + ": Received: " + fileName + " \n").encode())
 
         # Locking logic here. Locking the critical section.
-        # If thread cannot aquire, it gets blocked and can go to sleep.
+        # If thread cannot aquire, it gets blocked and can go to sleep if OS allows.
         transLock.acquire()
-        # Check if file is being used.
+        # Returns true if given file is available to transfer.
         canTransfer = self.canTransfer(fileName)
         # Thread releases once done with this code.
         transLock.release()
@@ -82,7 +82,7 @@ class Worker(Thread):
         print("Shutting down socket on Thread " + str(self.thisThread))
         self.socketConn.shutdown(socket.SHUT_WR)
     
-    # Returns true true if filename is not currently being transfered to.
+    # Returns true if given file is available to transfer.
     def canTransfer(self, fileName):
         global inTransfer
         if (fileName in inTransfer):
